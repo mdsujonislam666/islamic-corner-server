@@ -81,9 +81,18 @@ async function run() {
         app.put('/products/:id', async(req, res) =>{
             const id = req.params.id;
             const data = req.body
+            // console.log(data);
             const query = { _id: new ObjectId(id) }
-            const result = await productsCollection.updateOne(query)
-            res.send(result);
+            const update = {
+                $set: data
+            }
+            const result = await productsCollection.updateOne(query, update)
+            res.send(
+                {success: true,
+                    result
+                }
+
+            );
         })
 
         app.post('/products', async (req, res) => {
@@ -92,19 +101,6 @@ async function run() {
             res.send(result);
         })
 
-        app.patch('/products/:id', async (req, res) => {
-            const id = req.params.id;
-            const updateProduct = req.body;
-            const query = { _id: new ObjectId(id) }
-            const update = {
-                $set: {
-                    name: updateProduct.name,
-                    price: updateProduct.price
-                }
-            }
-            const result = await productsCollection.updateOne(query, update);
-            res.send(result);
-        })
 
         app.delete('/products/:id', async (req, res) => {
             const id = req.params.id;
