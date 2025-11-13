@@ -33,17 +33,9 @@ async function run() {
 
         app.post('/users', async (req, res) => {
             const newUser = req.body;
+            const result = await usersCollection.insertOne(newUser);
+            res.send(result);
 
-            const email = req.body.email;
-            const query = { email: email }
-            const existingUser = await usersCollection.findOne(query);
-            if (existingUser) {
-                res.send({ message: 'user already exits. do not need to insert again' })
-            }
-            else {
-                const result = await usersCollection.insertOne(newUser);
-                res.send(result);
-            }
         })
 
         app.get('/products', async (req, res) => {
@@ -59,14 +51,14 @@ async function run() {
             res.send(result);
         })
 
-        app.get('/allProducts', async(req, res) =>{
-            const cursor = productsCollection.find().sort({posted_date: -1})
+        app.get('/allProducts', async (req, res) => {
+            const cursor = productsCollection.find().sort({ posted_date: -1 })
             const result = await cursor.toArray();
             res.send(result);
         })
 
         app.get('/latest-products', async (req, res) => {
-            const cursor = productsCollection.find().sort({posted_date: -1}).limit(6);
+            const cursor = productsCollection.find().sort({ posted_date: -1 }).limit(6);
             const result = await cursor.toArray();
             res.send(result);
         })
@@ -78,7 +70,7 @@ async function run() {
             res.send(result);
         })
 
-        app.put('/products/:id', async(req, res) =>{
+        app.put('/products/:id', async (req, res) => {
             const id = req.params.id;
             const data = req.body
             // console.log(data);
@@ -88,7 +80,8 @@ async function run() {
             }
             const result = await productsCollection.updateOne(query, update)
             res.send(
-                {success: true,
+                {
+                    success: true,
                     result
                 }
 
@@ -109,11 +102,18 @@ async function run() {
             res.send(result);
         })
 
-        app.get("/myProducts", async(req, res) =>{
+        app.get("/myProducts", async (req, res) => {
             const email = req.query.email
-            const result = await productsCollection.find({"posted_by.email":email}).toArray();
+            const result = await productsCollection.find({ "posted_by.email": email }).toArray();
             res.send(result)
         })
+
+        app.get("/myRating", async (req, res) => {
+            const email = req.query.email
+            const result = await usersCollection.find({ "posted_by.email": email }).toArray();
+            res.send(result)
+        })
+
 
         await client.db("admin").command({ ping: 1 });
         console.log('Pinged your deployment. you successfully connected to MongoDB!');
