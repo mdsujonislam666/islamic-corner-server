@@ -46,7 +46,19 @@ async function run() {
             //     query.email = email;
             // }
 
-            const cursor = productsCollection.find();
+            const cursor = productsCollection.find().sort({ posted_date: -1 }).limit(3);
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+        app.get('/', async (req, res) => {
+            // console.log(req.query);
+            // const email = req.query.email;
+            // const query = {}
+            // if(email){
+            //     query.email = email;
+            // }
+
+            const cursor = productsCollection.find().sort({ posted_date: -1 }).limit(3);
             const result = await cursor.toArray();
             res.send(result);
         })
@@ -97,8 +109,9 @@ async function run() {
 
         app.delete('/products/:id', async (req, res) => {
             const id = req.params.id;
-            const query = { _id: new ObjectId(id) }
-            const result = await productsCollection.deleteOne(query);
+            const objectId = new ObjectId(id)
+            const filter = {_id: objectId}
+            const result = await productsCollection.deleteOne(filter);
             res.send(result);
         })
 
