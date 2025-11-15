@@ -77,8 +77,9 @@ async function run() {
 
         app.get('/products/:id', async (req, res) => {
             const id = req.params.id;
-            const query = { _id: new ObjectId(id) }
-            const result = await productsCollection.findOne(query);
+            const objectId = new ObjectId(id)
+            const filter = {_id: objectId}
+            const result = await productsCollection.findOne(filter);
             res.send(result);
         })
 
