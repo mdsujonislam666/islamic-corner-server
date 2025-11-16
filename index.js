@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+require("dotenv").config();
+const { MongoClient, ServerApiVersion, ObjectId, Admin } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 4000;
 
@@ -9,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 
-const uri = "mongodb+srv://islamic-corner:VgKNrJ8rmC2EYw5g@cluster0.skswfst.mongodb.net/?appName=Cluster0";
+const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.skswfst.mongodb.net/?appName=Cluster0`;
 
 const client = new MongoClient(uri, {
     serverApi: {
@@ -18,6 +19,27 @@ const client = new MongoClient(uri, {
         deprecationErrors: true,
     }
 });
+
+const verifyToken = async(req, res, next) =>{
+    const authorization = req.headers.authorization;
+
+    if(!authorization){
+        return res.status(401).send({
+            message: "unauthorized access. Token not found!", 
+        });
+    }
+
+    const Token = authorization.split(" ")[1];
+    try{
+        await admin.auth().verifyIdToken(Token);
+        next();
+    }
+    catch(error){
+        res.status(401).send({
+            message: "unauthorized access",
+        });
+    }
+};
 
 app.get('/', (req, res) => {
     res.send('smart server is running')
@@ -80,6 +102,12 @@ async function run() {
             const objectId = new ObjectId(id)
             const filter = {_id: objectId}
             const result = await productsCollection.findOne(filter);
+            res.send(result);
+        })
+
+        app.get('/search', async(req, res) =>{
+            const search_text = req.query.search
+            const result = await productsCollection.find({property_name: {$regex: search_text, $options: "i"}}).toArray()
             res.send(result);
         })
 
