@@ -20,26 +20,26 @@ const client = new MongoClient(uri, {
     }
 });
 
-const verifyToken = async(req, res, next) =>{
-    const authorization = req.headers.authorization;
+// const verifyToken = async(req, res, next) =>{
+//     const authorization = req.headers.authorization;
 
-    if(!authorization){
-        return res.status(401).send({
-            message: "unauthorized access. Token not found!", 
-        });
-    }
+//     if(!authorization){
+//         return res.status(401).send({
+//             message: "unauthorized access. Token not found!", 
+//         });
+//     }
 
-    const Token = authorization.split(" ")[1];
-    try{
-        await admin.auth().verifyIdToken(Token);
-        next();
-    }
-    catch(error){
-        res.status(401).send({
-            message: "unauthorized access",
-        });
-    }
-};
+//     const Token = authorization.split(" ")[1];
+//     try{
+//         await admin.auth().verifyIdToken(Token);
+//         next();
+//     }
+//     catch(error){
+//         res.status(401).send({
+//             message: "unauthorized access",
+//         });
+//     }
+// };
 
 app.get('/', (req, res) => {
     res.send('smart server is running')
@@ -47,7 +47,7 @@ app.get('/', (req, res) => {
 
 async function run() {
     try {
-        await client.connect();
+        // await client.connect();
 
         const db = client.db('islamic_db');
         const productsCollection = db.collection('products');
@@ -157,7 +157,7 @@ async function run() {
         })
 
 
-        await client.db("admin").command({ ping: 1 });
+        // await client.db("admin").command({ ping: 1 });
         console.log('Pinged your deployment. you successfully connected to MongoDB!');
 
     }
